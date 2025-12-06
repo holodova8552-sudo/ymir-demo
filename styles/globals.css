@@ -1,0 +1,49 @@
+html, body, #__next {
+  height: 100%;
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background: #0b1020;
+  color: #e7eef8;
+}
+
+.container {
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+/* Card style */
+.card {
+  background: rgba(255,255,255,0.03);
+  border-radius: 8px;
+  padding: 1rem;
+  border: 1px solid rgba(255,255,255,0.04);
+}
+
+/* AOT background placeholder — add /public/images/bg-aot.jpg to apply */
+.aot-bg {
+  background-image: url('/images/bg-aot.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+/* simple nav */
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: rgba(0,0,0,0.6);
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+
+a { color: #ffd5a6; text-decoration: none; margin-right: 0.75rem; }
+button { cursor: pointer; }
+input, select, textarea {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.04);
+  color: #fff;
+  padding: 0.5rem;
+  border-radius: 6px;
+  width: 100%;
+}
