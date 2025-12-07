@@ -1,13 +1,10 @@
 import React from "react";
 import NavBar from "./NavBar";
-
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <div className="aot-bg" style={{ minHeight: "100vh", paddingBottom: "3rem" }}>
+    <div className="min-h-screen aot-bg bg-cover bg-center">
       <NavBar />
-      <div className="container" style={{ paddingTop: "1rem" }}>
-        {children}
-      </div>
+      <main className="container mx-auto p-4">{children}</main>
     </div>
   );
 };
