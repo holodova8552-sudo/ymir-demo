@@ -1,67 +1,51 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import axios from "axios";
+import { useRouter } from "next/router";
 
-export default function LoginPage() {
+export default function Login() {
   const [phone, setPhone] = useState("");
   const [username, setUsername] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
-  const [devOtp, setDevOtp] = useState<string | null>(null);
+  const router = useRouter();
 
-  async function sendOtp(e: any) {
+  async function requestOtp(e: any) {
     e.preventDefault();
-    const res = await fetch("/api/auth/request-otp", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ phone, username }),
-    });
-    const json = await res.json();
-    if (res.ok) {
+    try {
+      await axios.post("/api/auth/request-otp", { phone, username });
       setOtpSent(true);
-      // demo: API includes otp in response for quick testing
-      if (json.otp) setDevOtp(json.otp);
-      alert("OTP sent (in demo it is returned by API). Use YMIRBOTZ or the returned OTP.");
-    } else {
-      alert(json.message || "Error");
+      alert("OTP sent to WhatsApp.");
+    } catch (err: any) {
+      alert(err?.response?.data?.message || err.message);
     }
   }
 
-  async function verify(e: any) {
+  async function verifyOtp(e: any) {
     e.preventDefault();
-    const res = await fetch("/api/auth/verify-otp", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ phone, otp }),
-    });
-    const json = await res.json();
-    if (res.ok) {
-      window.location.href = "/dashboard";
-    } else {
-      alert(json.message || "Invalid OTP");
+    try {
+      await axios.post("/api/auth/verify-otp", { phone, otp });
+      router.push("/dashboard");
+    } catch (err: any) {
+      alert(err?.response?.data?.message || err.message);
     }
   }
 
   return (
-    <div style={{ maxWidth: 600, margin: "2rem auto" }} className="card">
-      <h2>Login / Create account (WhatsApp demo)</h2>
+    <div className="max-w-md mx-auto mt-12 card">
+      <h1 className="text-2xl mb-4">Login or Create Account</h1>
       {!otpSent ? (
-        <form onSubmit={sendOtp} style={{ display: "grid", gap: 8 }}>
-          <label>WhatsApp phone (E.164):</label>
-          <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+1555..." />
-          <label>Username:</label>
-          <input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Eren" />
-          <div style={{ display: "flex", gap: 8 }}>
-            <button type="submit">Send OTP</button>
-          </div>
+        <form onSubmit={requestOtp} className="space-y-3">
+          <label>WhatsApp Phone e.g. +62... </label>
+          <input className="w-full p-2 rounded bg-black bg-opacity-30" value={phone} onChange={(e)=>setPhone(e.target.value)} />
+          <label>Username</label>
+          <input className="w-full p-2 rounded bg-black bg-opacity-30" value={username} onChange={(e)=>setUsername(e.target.value)} />
+          <button className="bg-blue-600 px-4 py-2 rounded">Send OTP via WhatsApp</button>
         </form>
       ) : (
-        <form onSubmit={verify} style={{ display: "grid", gap: 8 }}>
-          <label>Enter OTP (demo: YMIRBOTZ or provided):</label>
-          <input value={otp} onChange={(e) => setOtp(e.target.value)} />
-          <div>
-            <button type="submit">Verify & Sign In</button>
-            <button type="button" onClick={() => { setOtpSent(false); setDevOtp(null); }}>Back</button>
-          </div>
-          {devOtp && <div style={{ marginTop: 8 }}>Dev OTP: <strong>{devOtp}</strong></div>}
+        <form onSubmit={verifyOtp} className="space-y-3">
+          <label>Enter OTP</label>
+          <input className="w-full p-2 rounded bg-black bg-opacity-30" value={otp} onChange={(e)=>setOtp(e.target.value)} />
+          <button className="bg-green-600 px-4 py-2 rounded">Verify & Sign In</button>
         </form>
       )}
     </div>

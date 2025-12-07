@@ -1,41 +1,34 @@
-import React, { useState } from "react";
 import useSWR from "swr";
+import axios from "axios";
+import { useState } from "react";
 
-const fetcher = (url: string) => fetch(url).then(r => r.json());
+const fetcher = (url: string) => axios.get(url).then(r => r.data);
 
 export default function Profile() {
   const { data } = useSWR("/api/auth/me", fetcher);
-  const [file, setFile] = useState<File | null>(null);
+  const [pfpFile, setPfpFile] = useState<File | null>(null);
 
   if (!data) return <div className="card">Loading...</div>;
 
-  async function upload(e: any) {
+  async function uploadPfp(e: any) {
     e.preventDefault();
-    if (!file) return alert("Pick a file");
+    if (!pfpFile) return alert("Pick a file");
     const fd = new FormData();
-    fd.append("pfp", file);
-    const res = await fetch("/api/profile/upload-pfp", { method: "POST", body: fd });
-    const j = await res.json();
-    if (res.ok) {
-      alert("Uploaded");
-      location.reload();
-    } else {
-      alert(j.message || "Upload failed");
-    }
+    fd.append("pfp", pfpFile);
+    const res = await axios.post("/api/profile/upload-pfp", fd);
+    alert("Uploaded");
+    location.reload();
   }
 
   return (
-    <div className="card" style={{ maxWidth: 600 }}>
-      <h2>Profile</h2>
-      <img src={data.user.pfpUrl || "/images/default-pfp.png"} style={{ width: 140, height: 140, borderRadius: "50%" }} />
-      <p>Username: {data.user.username}</p>
-      <p>Phone: {data.user.phone}</p>
-
-      <form onSubmit={upload}>
-        <input type="file" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
-        <button type="submit">Upload PFP</button>
+    <div className="card max-w-xl mx-auto">
+      <h2 className="text-2xl">Profile</h2>
+      <img src={data.user.pfpUrl || "/images/default-pfp.png"} className="h-40 w-40 rounded-full" />
+      <form onSubmit={uploadPfp} className="mt-3">
+        <input type="file" onChange={(e) => setPfpFile(e.target.files?.[0] ?? null)} />
+        <button className="bg-blue-600 px-3 py-1 rounded ml-2">Upload</button>
       </form>
-      <p style={{ marginTop: 12 }}>Note: In production, upload should go to cloud storage (S3/Cloudinary). On Vercel uploads to /public/uploads are ephemeral.</p>
+      <p className="mt-3">Username: {data.user.username}</p>
     </div>
   );
 }
